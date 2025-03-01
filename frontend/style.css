@@ -1,0 +1,99 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  background-color: #080808;
+  color: white;
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+
+.Header {
+  max-width: 120rem;
+  justify-self: center;
+  margin-top: 5rem;
+}
+
+.Nav {
+  display: flex;
+  gap: 10rem;
+}
+
+.Nav a.active {
+  color: #F4B060;
+  border-bottom: solid 1px #F4B060;
+}
+
+.Nav a {
+  color: white;
+  font-size: 1.8rem;
+  text-decoration: none;
+  padding: 1rem 0.5rem;
+}
+
+.Nav a:hover {
+  color: #F4B060;
+  transition: all 0.3s ease;
+}
+
+#Marax {
+  position: fixed;
+  left: 0;
+  top: 0;
+  margin-left: 2rem;
+  margin-top: 2rem;
+}
+
+.Marax {
+  font-family: Bodoni Moda, sans-serf;
+  font-size: 10rem;
+  color: #F4B060;
+}
+
+.btn-whats {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 2rem;
+  background-color: transparent;
+  border: 1px solid #f1f1f1;
+  border-radius: 1rem;
+  width: max-content;
+  transition: all 0.3s ease;
+}
+
+.btn-whats p {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #f1f1f1;
+  transition: color 0.3s ease;
+}
+
+.logowhats {
+  width: 3.12rem;
+  height: auto;
+  fill: #f1f1f1;
+  transition: fill 0.3s ease;
+}
+
+a:hover .btn-whats p,
+a:hover .logowhats {
+  color: green;
+  fill: green;
+}
+
+a:hover .btn-whats {
+  border: 1px solid green;
+  background-color: rgba(0, 0, 0, 0.658);
+}
