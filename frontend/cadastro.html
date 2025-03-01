@@ -13,8 +13,8 @@
     <h1>Cadastro de Veículos</h1>
     <form id="cadastroForm">
       <div class="form-group">
-        <label for="fotos">URLs das Fotos:</label>
-        <input type="text" id="fotos" placeholder="Insira as URLs separadas por vírgula">
+        <label for="fotos">Fotos:</label>
+        <input type="file" id="fotos" multiple accept="image/*">
       </div>
       <div class="form-group">
         <label for="descricao">Descrição:</label>
@@ -39,7 +39,6 @@
       <div class="btns-cadastro">
         <button type="button"><a href="./anuncios.html">Voltar</a></button>
         <button type="submit">Cadastrar</button>
-        <button id="publicarBtn">Publicar Veículo Cadastrado</button>
       </div>
     </form>
 

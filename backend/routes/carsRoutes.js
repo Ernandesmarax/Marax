@@ -1,7 +1,20 @@
 import express from "express";
+import multer from "multer";
 import CarsRepository from "../repository/CarsRepository.js";
 
 const router = express.Router();
+
+// Configuração do Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Pasta temporária para armazenar as imagens
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname); // Nome do arquivo
+  },
+});
+
+const upload = multer({ storage });
 
 // Rota que busca todos os carros já cadastrado, para serem exibidos na página
 router.get("/", async (req, res) => {

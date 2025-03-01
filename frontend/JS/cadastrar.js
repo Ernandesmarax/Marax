@@ -3,12 +3,18 @@ document
   .addEventListener("submit", async function (event) {
     event.preventDefault(); // Impede o envio tradicional do formulário
 
-    const fotosInput = document.getElementById("fotos").value.trim();
-    if (!fotosInput) {
-      alert("Por favor, insira pelo menos uma URL de imagem.");
+    const fotosInput = document.getElementById("fotos").files;
+    if (!fotosInput || fotosInput.length === 0) {
+      alert("Por favor, insira pelo menos uma imagem.");
       return;
     }
-    const fotos = fotosInput.split(",").map((url) => url.trim()); // Divide as URLs por vírgula e remove espaços
+
+    const fotos = [];
+    for (let i = 0; i < fotosInput.length; i++) {
+      const file = fotosInput[i];
+      const base64 = await convertToBase64(file);
+      fotos.push(base64);
+    }
 
     const description = document.getElementById("descricao").value.trim();
     const model = document.getElementById("modelo").value.trim();
@@ -50,28 +56,11 @@ document
     }
   });
 
-document
-  .getElementById("publicarBtn")
-  .addEventListener("click", async function () {
-    try {
-      // Busca o último veículo cadastrado no banco de dados
-      const response = await fetch("http://localhost:4000/cars/latest", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao buscar o veículo cadastrado.");
-      }
-
-      const latestCar = await response.json();
-
-      // Redireciona para a página de anúncios com os dados do novo veículo
-      window.location.href = `anuncios.html?newCar=${encodeURIComponent(
-        JSON.stringify(latestCar)
-      )}`;
-    } catch (error) {
-      console.error("Erro:", error);
-      alert("Erro ao publicar o veículo cadastrado.");
-    }
+function convertToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = (error) => reject(error);
   });
+}

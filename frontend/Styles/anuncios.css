@@ -70,7 +70,9 @@ body {
     &.btn-imgs-next {
       right: 0;
     }
+  }
 
+  .box--imgs {
     img {
       width: 100%;
       height: auto;
@@ -80,9 +82,13 @@ body {
 }
 
 .dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
-  margin-top: 10px;
+  gap: 5px;
+  z-index: 10;
 }
 
 .dot {

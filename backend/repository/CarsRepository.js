@@ -24,14 +24,16 @@ class CarsRepository extends BaseRepository {
       ]);
       const newCar = carResult.rows[0];
 
-      // Insere as URLs das imagens na tabela `carsimgs`
+      // Insere as imagens na tabela `carsimgs`
       if (fotos && fotos.length > 0) {
         const imgQuery = `
-          INSERT INTO carsimgs (car_id, url_img)
+          INSERT INTO carsimgs (car_id, img_data)
           VALUES ($1, $2);
         `;
-        for (const url of fotos) {
-          await pool.query(imgQuery, [newCar.id, url]);
+        for (const foto of fotos) {
+          // Converte a imagem para um buffer
+          const imgBuffer = Buffer.from(foto, "base64");
+          await pool.query(imgQuery, [newCar.id, imgBuffer]);
         }
       }
 
@@ -49,7 +51,7 @@ class CarsRepository extends BaseRepository {
   async getLatest() {
     try {
       const queryText = `
-        SELECT c.*, array_agg(ci.url_img) AS fotos
+        SELECT c.*, array_agg(ci.img_data) AS fotos
         FROM cars c
         LEFT JOIN carsimgs ci ON c.id = ci.car_id
         GROUP BY c.id
@@ -66,12 +68,18 @@ class CarsRepository extends BaseRepository {
   async getCarImages(carId) {
     try {
       const query = `
-        SELECT url_img
+        SELECT img_data
         FROM carsimgs
         WHERE car_id = $1;
       `;
       const result = await pool.query(query, [carId]);
-      return result.rows;
+
+      // Converte os dados binários para base64 (se necessário)
+      const images = result.rows.map((row) => ({
+        img_data: row.img_data.toString("base64"), // Certifique-se de que é uma string base64
+      }));
+
+      return images;
     } catch (error) {
       throw error;
     }
