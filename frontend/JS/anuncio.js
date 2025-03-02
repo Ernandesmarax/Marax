@@ -67,7 +67,93 @@ async function carregarCarros() {
       carrosselInner.insertAdjacentHTML("beforeend", novoAnuncio);
     });
 
-    // Aguarda o carregamento dos anúncios antes de manipular o DOM
+    // Inicializar os carrosséis de imagens após os elementos serem adicionados ao DOM
+    document.querySelectorAll(".carrossel-imgs").forEach((carrossel) => {
+      const carrosselImagens = carrossel.querySelector(".box--imgs");
+      const imagens = carrosselImagens.querySelectorAll("img"); // Coleção de imagens
+      const dotsContainer = carrossel.querySelector(".dots");
+      const totalImagens = imagens.length;
+      const imageWidth = imagens[0].offsetWidth;
+
+      console.log(`Carrossel encontrado com ${imagens.length} imagens`);
+      imagens.forEach((img, idx) =>
+        console.log(
+          `Imagem ${idx}: src="${img.src}", data-src="${img.dataset.src}"`
+        )
+      );
+
+      let i = 0;
+
+      // Criar as bolinhas dinamicamente
+      imagens.forEach((_, idx) => {
+        const dot = document.createElement("div");
+        dot.classList.add("dot");
+        if (idx === 0) dot.classList.add("active");
+        dot.addEventListener("click", () => {
+          console.log(`Clicou na bolinha ${idx}`);
+          i = idx;
+          carregarImagem(i);
+          updateCarrosselImagens();
+        });
+        dotsContainer.appendChild(dot);
+      });
+
+      const dots = dotsContainer.querySelectorAll(".dot");
+
+      function carregarImagem(index) {
+        const img = imagens[index];
+        if (img) {
+          console.log(
+            `Imagem ${index} - Antes: src="${img.src}", data-src="${img.dataset.src}"`
+          );
+          if (!img.src || img.src === "") {
+            img.src = img.dataset.src;
+            console.log(`Imagem ${index} - Depois: src="${img.src}"`);
+            img.onload = () =>
+              console.log(`Imagem ${index} carregada com sucesso`);
+            img.onerror = () =>
+              console.error(`Erro ao carregar imagem ${index}`);
+          } else {
+            console.log(`Imagem ${index} já tem src definido, nada feito`);
+          }
+        } else {
+          console.error(`Imagem ${index} não encontrada`);
+        }
+      }
+
+      function updateCarrosselImagens() {
+        carrosselImagens.style.transform = `translateX(${-i * imageWidth}px)`;
+        updateDots();
+      }
+
+      function updateDots() {
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle("active", idx === i);
+        });
+      }
+
+      // Botão Próximo
+      const nextBtn = carrossel.querySelector(".btn-imgs-next");
+      nextBtn.addEventListener("click", () => {
+        console.log("Clicou no botão Próximo");
+        i = i < totalImagens - 1 ? i + 1 : 0;
+        carregarImagem(i);
+        updateCarrosselImagens();
+      });
+
+      // Botão Anterior
+      const prevBtn = carrossel.querySelector(".btn-imgs-prev");
+      prevBtn.addEventListener("click", () => {
+        console.log("Clicou no botão Anterior");
+        i = i > 0 ? i - 1 : totalImagens - 1;
+        carregarImagem(i);
+        updateCarrosselImagens();
+      });
+
+      carregarImagem(0); // Carrega a primeira imagem
+    });
+
+    // Lógica do carrossel de anúncios (mantida como estava)
     setTimeout(() => {
       const boxs = document.querySelectorAll(".boxs");
       const prevBtn = document.querySelector(".prev-btn");
@@ -125,66 +211,3 @@ async function carregarCarros() {
 }
 
 window.addEventListener("DOMContentLoaded", carregarCarros);
-
-// === CARROSSEL DE IMAGENS COM BOLINHAS === //
-document.querySelectorAll(".carrossel-imgs").forEach((carrossel) => {
-  const carrosselImagens = carrossel.querySelector(".box--imgs");
-  const imagens = carrosselImagens.querySelectorAll("img");
-  const dotsContainer = carrossel.querySelector(".dots");
-  const totalImagens = imagens.length;
-  const imageWidth = imagens[0].offsetWidth;
-
-  let i = 0; // Índice separado por carrossel
-
-  // === Criar as bolinhas === //
-  imagens.forEach((_, idx) => {
-    const dot = document.createElement("div");
-    dot.classList.add("dot");
-    if (idx === 0) dot.classList.add("active"); // A primeira está ativa
-
-    dot.addEventListener("click", () => {
-      i = idx;
-      carregarImagem(i);
-      updateCarrosselImagens();
-    });
-
-    dotsContainer.appendChild(dot);
-  });
-
-  const dots = dotsContainer.querySelectorAll(".dot");
-
-  function carregarImagem(index) {
-    const img = imagens[index];
-    if (img && !img.src) {
-      img.src = img.dataset.src;
-    }
-  }
-
-  function updateCarrosselImagens() {
-    carrosselImagens.style.transform = `translateX(${-i * imageWidth}px)`;
-    updateDots();
-  }
-
-  function updateDots() {
-    dots.forEach((dot, idx) => {
-      dot.classList.toggle("active", idx === i);
-    });
-  }
-
-  // === Botão Próximo === //
-  carrossel.querySelector(".btn-imgs-next").addEventListener("click", () => {
-    i = i < totalImagens - 1 ? i + 1 : 0;
-    carregarImagem(i);
-    updateCarrosselImagens();
-  });
-
-  // === Botão Anterior === //
-  carrossel.querySelector(".btn-imgs-prev").addEventListener("click", () => {
-    i = i > 0 ? i - 1 : totalImagens - 1;
-    carregarImagem(i);
-    updateCarrosselImagens();
-  });
-
-  // Carregar a primeira imagem no início
-  carregarImagem(0);
-});
