@@ -11,25 +11,30 @@ async function carregarCarros() {
     // Limpa o carrossel antes de adicionar novos anúncios
     carrosselInner.innerHTML = "";
 
-    carros.forEach(async (carro) => {
-      // Busca as imagens relacionadas ao carro
-      const imagensResponse = await fetch(
-        `http://localhost:4000/carsimgs/${carro.id}`
-      );
-      const imagens = imagensResponse.ok ? await imagensResponse.json() : [];
-      console.log("Imagens carregadas:", imagens);
+    // Usar Promise.all para garantir que todas as requisições de imagens sejam concluídas
+    const carrosComImagens = await Promise.all(
+      carros.map(async (carro) => {
+        const imagensResponse = await fetch(
+          `http://localhost:4000/cars/carsimgs/${carro.id}`
+        );
+        const imagens = imagensResponse.ok ? await imagensResponse.json() : [];
+        return { ...carro, imagens };
+      })
+    );
 
-      // Cria o HTML do novo anúncio
+    carrosComImagens.forEach((carro) => {
       const novoAnuncio = `
         <div class="boxs">
           <div class="carrossel-imgs">
             <div class="box--imgs">
-              ${imagens
+              ${carro.imagens
                 .map(
                   (imagem, index) =>
-                    `<img ${index === 0 ? "src" : "data-src"}="${
-                      imagem.url_img
-                    }" alt="Carro ${carro.id}">`
+                    `<img ${
+                      index === 0 ? "src" : "data-src"
+                    }="data:image/jpeg;base64,${imagem.img_data}" alt="Carro ${
+                      carro.id
+                    }">`
                 )
                 .join("")}
             </div>
@@ -52,14 +57,13 @@ async function carregarCarros() {
             </div>
             <div class="box__descricao--style">
               <p>Km Rodado:</p>
-              <p>${carro.km_driven} km</p>
+              <p>${carro.km_driven}km</p>
             </div>
             <p class="preco">R$ ${carro.price.toLocaleString("pt-BR")}</p>
           </div>
         </div>
       `;
 
-      // Adiciona o novo anúncio ao carrossel
       carrosselInner.insertAdjacentHTML("beforeend", novoAnuncio);
     });
 
@@ -71,7 +75,7 @@ async function carregarCarros() {
 
       let index = -1;
       const totalItems = boxs.length - 1;
-      const anuncioWidth = boxs[0].offsetWidth + 20; // Agora boxs[0] existe
+      const anuncioWidth = boxs[0].offsetWidth + 20;
 
       function updateCarrosselAnuncios() {
         carrosselInner.style.transform = `translateX(${
@@ -113,78 +117,14 @@ async function carregarCarros() {
         }
       });
 
-      // Verifica se há apenas um anúncio ao carregar a página
       checkSingleItem();
-    }, 100); // Aguarda 100ms para garantir que os elementos foram renderizados
+    }, 100);
   } catch (error) {
     console.error("Erro ao carregar carros:", error);
   }
 }
 
-// Carrega os carros ao iniciar a página
 window.addEventListener("DOMContentLoaded", carregarCarros);
-
-// // Função para adicionar um novo anúncio ao carrossel
-// function adicionarNovoAnuncio(car) {
-//   const carrosselInner = document.querySelector(".carrossel-inner");
-
-//   // Cria o HTML do novo anúncio
-//   const novoAnuncio = `
-//     <div class="boxs">
-//       <div class="carrossel-imgs">
-//         <div class="box--imgs">
-//           ${car.fotos
-//             .map(
-//               (url, index) =>
-//                 `<img ${index === 0 ? "src" : "data-src"}="${url}" alt="Carro ${
-//                   car.id
-//                 }">`
-//             )
-//             .join("")}
-//         </div>
-//         <button class="btn-imgs btn-imgs-next">❯</button>
-//         <button class="btn-imgs btn-imgs-prev">❮</button>
-//         <div class="dots"></div>
-//       </div>
-//       <div class="box__descricao">
-//         <div class="box__descricao--style">
-//           <p>Descrição:</p>
-//           <p>${car.description}</p>
-//         </div>
-//         <div class="box__descricao--style">
-//           <p>Modelo:</p>
-//           <p>${car.model}</p>
-//         </div>
-//         <div class="box__descricao--style">
-//           <p>Ano:</p>
-//           <p>${car.year}</p>
-//         </div>
-//         <div class="box__descricao--style">
-//           <p>Km Rodado:</p>
-//           <p>${car.km_driven}km</p>
-//         </div>
-//         <p class="preco">R$ ${car.price}</p>
-//       </div>
-//     </div>
-//   `;
-
-//   // Adiciona o novo anúncio ao carrossel
-//   carrosselInner.insertAdjacentHTML("beforeend", novoAnuncio);
-
-//   // Reaplica a lógica do carrossel de imagens para o novo anúncio
-//   document.querySelectorAll(".carrossel-imgs").forEach((carrossel) => {
-//     // Lógica do carrossel de imagens (já existente no arquivo)
-//   });
-// }
-
-// Captura os dados do novo veículo da URL
-const urlParams = new URLSearchParams(window.location.search);
-const newCarParam = urlParams.get("newCar");
-
-if (newCarParam) {
-  const newCar = JSON.parse(decodeURIComponent(newCarParam));
-  adicionarNovoAnuncio(newCar);
-}
 
 // === CARROSSEL DE IMAGENS COM BOLINHAS === //
 document.querySelectorAll(".carrossel-imgs").forEach((carrossel) => {
