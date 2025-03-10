@@ -1,2 +1,4 @@
 .env
 SQL.sql
+node_modules/
+uploads/
